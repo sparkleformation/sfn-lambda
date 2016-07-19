@@ -1,0 +1,5 @@
+require 'sfn'
+require 'sfn-lambda/setup'
+require 'sfn-lambda/control'
+require 'sfn-lambda/inject'
+require 'sfn-lambda/version'
