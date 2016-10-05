@@ -1,6 +1,8 @@
+$LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__)) + '/lib/'
+require 'sfn-lambda/version'
 Gem::Specification.new do |s|
   s.name = 'sfn-lambda'
-  s.version = '0.1.0'
+  s.version = SfnLambda::VERSION.to_s
   s.summary = 'AWS Lambda integration for SparkleFormation'
   s.author = 'Chris Roberts'
   s.email = 'chrisroberts.code@gmail.com'
