@@ -211,7 +211,7 @@ module SfnLambda
           if(self[:build_required].keys.include?(dir_item))
             Dir.new(File.join(path, dir_item)).each do |item|
               next if item.start_with?('.')
-              full_item = file.join(path, dir_item, item)
+              full_item = File.join(path, dir_item, item)
               next unless File.directory?(full_item)
               functions.set(dir_item, item, full_item)
             end
