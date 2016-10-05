@@ -44,7 +44,7 @@ end
 ```
 
 _NOTE: If using the `java8` runtime for lambda functions, `maven` must
-be installed with `mvn` being available within the user's PATH.
+be installed with `mvn` being available within the user's PATH._
 
 ### Configuration
 
@@ -64,7 +64,7 @@ end
 
 #### S3 lambda function file storage
 
-By default the `sfn-lambda` callback will use the bucket named provided by
+By default the `sfn-lambda` callback will use the bucket name provided by
 the `nesting_bucket` configuration item. This can be customized to use a
 different bucket by modifying the configuration:
 
@@ -122,7 +122,7 @@ def my_handler(event, context):
     }
 ```
 
-Now new lambda function resources can be created within a SparkleFormation template using
+Now, using a new helper method, lambda resources can be created within a SparkleFormation template using
 the newly created file:
 
 * `./sparkleformation/lambda_test.rb`
