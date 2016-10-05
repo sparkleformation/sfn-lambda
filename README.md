@@ -208,3 +208,8 @@ When the `hello` lambda function is used within a template, `sfn-lambda` will au
 the required jar file using Maven and store the resulting asset on S3.
 
 _NOTE: Maven is required to be installed when using the `java8` runtime_
+
+## Info
+
+* Repository: https://github.com/sparkleformation/sfn-lambda
+* IRC: Freenode @ #sparkleformation
