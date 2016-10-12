@@ -12,7 +12,7 @@ class SparkleFormation
         __t_stringish(fn_uniq_name) unless fn_uniq_name.is_a?(::NilClass)
         if(fn_opts)
           fn_runtime = fn_opts[:runtime] if fn_opts[:runtime]
-          fn_handler = fn_opts[:handler] if fn_opts[:handler]
+          fn_handler = fn_opts[:handler] ? fn_opts[:handler] : 'handler'
         end
         unless(fn_runtime.is_a?(::NilClass))
           __t_stringish(fn_runtime)
