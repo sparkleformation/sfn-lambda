@@ -37,6 +37,7 @@ Now enable the `sfn-lambda` callback in the `.sfn` configuration file:
 Configuration.new do
   ...
   callbacks do
+    require ['sfn-lambda']
     default ['lambda']
   end
   ...
