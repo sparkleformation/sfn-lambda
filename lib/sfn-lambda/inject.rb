@@ -14,6 +14,7 @@ class SparkleFormation
         if(fn_opts)
           fn_runtime = fn_opts[:runtime] if fn_opts[:runtime]
           fn_handler = fn_opts[:handler] if fn_opts[:handler]
+          fn_role    = fn_opts[:role] if fn_opts[:role]
         end
         unless(fn_runtime.is_a?(::NilClass))
           __t_stringish(fn_runtime)
@@ -30,6 +31,7 @@ class SparkleFormation
         if(content[:raw])
           new_fn.properties.code.zip_file content[:raw]
           new_fn.properties.handler "index.#{fn_handler}"
+          new_fn.properties.role fn_role
         else
           new_fn.properties.code.s3_bucket content[:bucket]
           new_fn.properties.code.s3_key content[:key]
