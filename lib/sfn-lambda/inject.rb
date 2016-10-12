@@ -15,6 +15,7 @@ class SparkleFormation
           fn_runtime = fn_opts[:runtime] if fn_opts[:runtime]
           fn_handler = fn_opts[:handler] if fn_opts[:handler]
           fn_role    = fn_opts[:role] if fn_opts[:role]
+          fn_function_name = fn_opts[:function_name] if fn_opts[:function_name]
         end
         unless(fn_runtime.is_a?(::NilClass))
           __t_stringish(fn_runtime)
@@ -26,7 +27,7 @@ class SparkleFormation
         )
         new_fn.properties.handler fn_handler
         new_fn.properties.runtime lookup[:runtime]
-        new_fn.properties.function_name fn_name
+        new_fn.properties.function_name fn_function_name || fn_name
         content = ::SfnLambda.control.format_content(lookup)
         if(content[:raw])
           new_fn.properties.code.zip_file content[:raw]
