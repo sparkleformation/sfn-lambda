@@ -134,7 +134,7 @@ SparkleFormation.new(:lambda_test) do
 end
 ```
 
-If the handler argument is not specific the default value is 'handler'
+If the handler argument is not specified the default value is 'handler'.
 
 ```ruby
 SparkleFormation.new(:lambda_test) do
