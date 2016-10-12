@@ -28,13 +28,13 @@ class SparkleFormation
         new_fn.properties.function_name fn_name
         content = ::SfnLambda.control.format_content(lookup)
         if(content[:raw])
-          new_fn.properties.zip_file content[:raw]
+          new_fn.properties.code.zip_file content[:raw]
           new_fn.properties.handler "index.#{fn_handler}"
         else
-          new_fn.properties.s3_bucket content[:bucket]
-          new_fn.properties.s3_key content[:key]
+          new_fn.properties.code.s3_bucket content[:bucket]
+          new_fn.properties.code.s3_key content[:key]
           if(content[:version])
-            new_fn.properties.s3_object_version content[:version]
+            new_fn.properties.code.s3_object_version content[:version]
           end
         end
         new_fn
