@@ -51,8 +51,9 @@ module SfnLambda
     #
     # @param name [String] name of lambda function
     # @param runtime [String] runtime of lambda function
+    # @param handler [String] handler of lambda function
     # @return [Hash] {:path, :runtime}
-    def get(name, runtime=nil)
+    def get(name, runtime=nil, handler='handler')
       unless(runtime)
         runtime = functions.keys.find_all do |r_name|
           functions[r_name].keys.include?(name.to_s)
@@ -68,7 +69,7 @@ module SfnLambda
       if(result.nil?)
         raise "Failed to locate requested lambda function `#{name}`"
       else
-        Smash.new(:path => result, :runtime => runtime, :name => name)
+        Smash.new(:path => result, :runtime => runtime, :name => name, :handler => handler)
       end
     end
 

@@ -12,20 +12,23 @@ class SparkleFormation
         __t_stringish(fn_uniq_name) unless fn_uniq_name.is_a?(::NilClass)
         if(fn_opts)
           fn_runtime = fn_opts[:runtime] if fn_opts[:runtime]
+          fn_handler = fn_opts[:handler] if fn_opts[:handler]
         end
         unless(fn_runtime.is_a?(::NilClass))
           __t_stringish(fn_runtime)
         end
-        lookup = ::SfnLambda.control.get(fn_name, fn_runtime)
+        lookup = ::SfnLambda.control.get(fn_name, fn_runtime, fn_handler)
         new_fn = _dynamic(:aws_lambda_function,
           [fn_name, fn_uniq_name].compact.map(&:to_s).join('_'),
           :resource_name_suffix => :lambda_function
         )
-        new_fn.properties.handler lookup[:runtime]
+        new_fn.properties.handler lookup[:handler]
+        new_fn.properties.runtime lookup[:runtime]
         new_fn.properties.function_name fn_name
         content = ::SfnLambda.control.format_content(lookup)
         if(content[:raw])
           new_fn.properties.zip_file content[:raw]
+          new_fn.properties.handler "index.#{lookup[:handler]}"
         else
           new_fn.properties.s3_bucket content[:bucket]
           new_fn.properties.s3_key content[:key]
