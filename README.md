@@ -37,6 +37,7 @@ Now enable the `sfn-lambda` callback in the `.sfn` configuration file:
 Configuration.new do
   ...
   callbacks do
+    require ['sfn-lambda']
     default ['lambda']
   end
   ...
@@ -112,7 +113,7 @@ Using the python example described within the lambda documentation:
 
 we can define our handler code:
 
-* `./lambda/python2.7/my_handler.py`
+* `./lambda/python2.7/my_function.py`
 
 ```python
 def my_handler(event, context):
@@ -129,7 +130,15 @@ the newly created file:
 
 ```ruby
 SparkleFormation.new(:lambda_test) do
-  lambda!(:my_handler)
+  lambda!(:my_function, :handler => :my_handler)
+end
+```
+
+If the handler argument is not specified the default value is 'handler'.
+
+```ruby
+SparkleFormation.new(:lambda_test) do
+  lambda!(:my_function)
 end
 ```
 
@@ -142,8 +151,9 @@ $ sfn print --file lambda_test
     "MyHandlerLambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
-        "Handler": "python2.7",
-        "FunctionName": "my_handler",
+        "Handler": "index.my_handler",
+        "Runtime": "python2.7"
+        "FunctionName": "my_function",
         "ZipFile": "def my_handler(event, context):\n    message = 'Hello {} {}!'.format(event['first_name'], event['last_name'])\n    return {\n        'message' : message\n    }\n\n"
       }
     }
@@ -156,7 +166,7 @@ can be specified within the call:
 
 ```ruby
 SparkleFormation.new(:lambda_test) do
-  lambda!(:my_handler, :runtime => 'python2.7')
+  lambda!(:my_function, :handler => :my_handler, :runtime => 'python2.7')
 end
 ```
 
@@ -165,8 +175,8 @@ custom name can be added as well:
 
 ```ruby
 SparkleFormation.new(:lambda_test) do
-  lambda!(:my_handler, :first, :runtime => 'python2.7')
-  lambda!(:my_handler, :second, :runtime => 'python2.7')
+  lambda!(:my_function, :first, :handler => :my_handler, :runtime => 'python2.7')
+  lambda!(:my_function, :second, :handler => :my_handler, :runtime => 'python2.7')
 end
 ```
 

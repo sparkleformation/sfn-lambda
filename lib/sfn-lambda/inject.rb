@@ -10,8 +10,12 @@ class SparkleFormation
         end
         __t_stringish(fn_name)
         __t_stringish(fn_uniq_name) unless fn_uniq_name.is_a?(::NilClass)
+        fn_handler = 'handler'
         if(fn_opts)
           fn_runtime = fn_opts[:runtime] if fn_opts[:runtime]
+          fn_handler = fn_opts[:handler] if fn_opts[:handler]
+          fn_role    = fn_opts[:role] if fn_opts[:role]
+          fn_function_name = fn_opts[:function_name] if fn_opts[:function_name]
         end
         unless(fn_runtime.is_a?(::NilClass))
           __t_stringish(fn_runtime)
@@ -21,16 +25,19 @@ class SparkleFormation
           [fn_name, fn_uniq_name].compact.map(&:to_s).join('_'),
           :resource_name_suffix => :lambda_function
         )
-        new_fn.properties.handler lookup[:runtime]
-        new_fn.properties.function_name fn_name
+        new_fn.properties.handler fn_handler
+        new_fn.properties.runtime lookup[:runtime]
+        new_fn.properties.function_name fn_function_name || fn_name
         content = ::SfnLambda.control.format_content(lookup)
         if(content[:raw])
-          new_fn.properties.zip_file content[:raw]
+          new_fn.properties.code.zip_file content[:raw]
+          new_fn.properties.handler "index.#{fn_handler}"
+          new_fn.properties.role fn_role
         else
-          new_fn.properties.s3_bucket content[:bucket]
-          new_fn.properties.s3_key content[:key]
+          new_fn.properties.code.s3_bucket content[:bucket]
+          new_fn.properties.code.s3_key content[:key]
           if(content[:version])
-            new_fn.properties.s3_object_version content[:version]
+            new_fn.properties.code.s3_object_version content[:version]
           end
         end
         new_fn
