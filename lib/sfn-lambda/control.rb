@@ -99,10 +99,10 @@ module SfnLambda
         io.close
 
         version = nil
-        unless(versioning_enabled?)
+        if(versioning_enabled?)
           s3 = callback.api.connection.api_for(:storage)
           result = s3.request(
-            :path => s3.file_path(file),
+            :path => s3.file_path(file.name),
             :endpoint => s3.bucket_endpoint(file.bucket),
             :method => :head
           )
@@ -158,7 +158,7 @@ module SfnLambda
 
     # @return [TrueClass, FalseClass] bucket has versioning enabled
     def versioning_enabled?
-      unless(@versioned.nil?)
+      if(@versioned.nil?)
         s3 = callback.api.connection.api_for(:storage)
         result = s3.request(
           :path => '/',
