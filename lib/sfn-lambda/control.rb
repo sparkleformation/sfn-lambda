@@ -13,12 +13,17 @@ module SfnLambda
 
     DEFAULTS = {
       :INLINE_MAX_SIZE => 4096,
-      :INLINE_RESTRICTED => ['java8'].freeze,
+      :INLINE_RESTRICTED => ['java8', 'go1.x'].freeze,
       :BUILD_REQUIRED => {
         'java8' => {
           :build_command => 'mvn package',
           :output_directory => './target',
-          :asset_extension => '.jar'
+          :asset_extension => 'jar'
+        }.freeze,
+        'go1.x' => {
+          :build_command => 'GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -ldflags="-s -w" -o target/ && zip -j -r target/main.zip target/*',
+          :output_directory => './target',
+          :asset_extension => 'zip'
         }.freeze
       }.freeze
     }.freeze
@@ -86,14 +91,16 @@ module SfnLambda
         Smash.new(:raw => File.read(info[:path]))
       else
         apply_build!(info)
-        key_name = generate_key_name(info)
         io = File.open(info[:path], 'rb')
         file = bucket.files.build
-        file.name = key_name
+        file.name = generate_key_name(info)
         file.body = io
         file.save
         io.close
-        if(versioning_enabled?)
+
+        version = nil
+        unless(versioning_enabled?)
+          s3 = callback.api.connection.api_for(:storage)
           result = s3.request(
             :path => s3.file_path(file),
             :endpoint => s3.bucket_endpoint(file.bucket),
@@ -101,7 +108,8 @@ module SfnLambda
           )
           version = result[:headers][:x_amz_version_id]
         end
-        Smash(:bucket => storage_bucket, :key => key_name, :version => version)
+
+        Smash.new(:bucket => bucket.name, :key => file.name, :version => version)
       end
     end
 
@@ -121,12 +129,12 @@ module SfnLambda
             raise "Failed to build lambda asset for storage! (path: `#{info[:path]}`)"
           end
         end
-        file = Dir.glob(File.join(info[:path], build_info[:output_directory], "*.#{build_config[:asset_extension]}")).first
+        file = Dir.glob(File.join(info[:path], build_info[:output_directory], "*.#{build_info[:asset_extension]}")).first
         if(file)
           info[:path] = file
           true
         else
-          debug "Glob pattern used for build asset detection: `#{File.join(info[:path], build_info[:output_directory], "*.#{build_config[:asset_extension]}")}`"
+          callback.ui.debug "Glob pattern used for build asset detection: `#{File.join(info[:path], build_info[:output_directory], "*.#{build_info[:asset_extension]}")}`"
           raise "Failed to locate generated build asset for storage! (path: `#{info[:path]}`)"
         end
       else
@@ -138,7 +146,7 @@ module SfnLambda
     def bucket
       storage_bucket = callback.config.fetch(:lambda, :upload, :bucket, callback.config[:nesting_bucket])
       if(storage_bucket)
-        s3 = api.connection.api_for(:storage)
+        s3 = callback.api.connection.api_for(:storage)
         l_bucket = s3.buckets.get(storage_bucket)
       end
       unless(l_bucket)
@@ -151,7 +159,7 @@ module SfnLambda
     # @return [TrueClass, FalseClass] bucket has versioning enabled
     def versioning_enabled?
       unless(@versioned.nil?)
-        s3 = api.connection.api_for(:storage)
+        s3 = callback.api.connection.api_for(:storage)
         result = s3.request(
           :path => '/',
           :params => {
@@ -178,7 +186,8 @@ module SfnLambda
             checksum << content
           end
         end
-        "sfn.lambda/#{info[:runtime]}/#{File.basename(info[:path])}-#{checksum.base64digest}"
+        checksum = Base64.urlsafe_encode64(checksum.digest)
+        "sfn.lambda/#{info[:runtime]}/#{info[:name]}/#{checksum}/#{File.basename(info[:path])}"
       end
     end
 

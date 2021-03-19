@@ -28,11 +28,11 @@ class SparkleFormation
         new_fn.properties.handler fn_handler
         new_fn.properties.runtime lookup[:runtime]
         new_fn.properties.function_name fn_function_name || fn_name
+        new_fn.properties.role fn_role
         content = ::SfnLambda.control.format_content(lookup)
         if(content[:raw])
           new_fn.properties.code.zip_file content[:raw]
           new_fn.properties.handler "index.#{fn_handler}"
-          new_fn.properties.role fn_role
         else
           new_fn.properties.code.s3_bucket content[:bucket]
           new_fn.properties.code.s3_key content[:key]
