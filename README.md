@@ -17,7 +17,7 @@ source files contained within configured directories.
  * Acceptable functions will be defined inline
  * S3 storage will be used when inline is unacceptable
  * S3 versioning will be used when bucket configured for versioning
- * Automatic asset builds (for `java8` runtime targets)
+ * Automatic asset builds (for `java8` and `go1.x` runtime targets)
 
 ## Usage
 
@@ -44,14 +44,18 @@ Configuration.new do
 end
 ```
 
-_NOTE: If using the `java8` runtime for lambda functions, `maven` must
-be installed with `mvn` being available within the user's PATH._
+_NOTE:_ 
+  * If using the `java8` runtime for lambda functions, `maven` must 
+    be installed with `mvn` being available within the user's PATH.
+  * If using the `go1.x` runtime for lambda functions, `golang` and 
+    `zip` utility must be installed with `go` and `zip` being available 
+    within the user's PATH.
 
 ### Configuration
 
 #### Lambda function files directory
 
-By default the `sfn-lambda` callback will search the `./lambda` directory
+By default, the `sfn-lambda` callback will search the `./lambda` directory
 for lambda function files. A custom directory path can be used by modifying
 the configuration:
 
@@ -65,7 +69,7 @@ end
 
 #### S3 lambda function file storage
 
-By default the `sfn-lambda` callback will use the bucket name provided by
+By default, the `sfn-lambda` callback will use the bucket name provided by
 the `nesting_bucket` configuration item. This can be customized to use a
 different bucket by modifying the configuration:
 
@@ -89,13 +93,9 @@ identifier to reference the function. The path structure is as follows:
 ./lambda/RUNTIME/FUNCTION_NAME.extension
 ```
 
-The `RUNTIME` defines the runtime used for handling the lambda function. At
-the time of writing this, that value can be one of:
-
-* `nodejs`
-* `nodejs4.3`
-* `java8`
-* `python2.7`
+The `RUNTIME` defines the runtime used for handling the lambda function.
+Please check https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html 
+for the full list.
 
 _NOTE: Runtime values are not validated which allows new runtimes to be used
 as they are made available._
